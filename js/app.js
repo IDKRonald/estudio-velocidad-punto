@@ -419,6 +419,60 @@
     }
   });
 
+  // ---------- Compartir lecturas con el equipo (.json) ----------
+
+  document.getElementById("btnExportJson").addEventListener("click", function () {
+    VP.downloadSessionJson(session);
+  });
+
+  document.getElementById("btnImportJson").addEventListener("click", function () {
+    document.getElementById("importFileInput").click();
+  });
+
+  document.getElementById("importFileInput").addEventListener("change", async function (e) {
+    var files = Array.prototype.slice.call(e.target.files || []);
+    if (!files.length) return;
+
+    var totalAdded = 0;
+    var totalSkipped = 0;
+    var fileErrors = [];
+
+    for (var i = 0; i < files.length; i++) {
+      try {
+        var text = await files[i].text();
+        var data = JSON.parse(text);
+        var incomingSession = data && data.session ? data.session : data;
+        if (!incomingSession || !Array.isArray(incomingSession.lecturas)) {
+          throw new Error("no tiene el formato esperado");
+        }
+        var result = VP.mergeLecturas(session.lecturas, incomingSession.lecturas);
+        session.lecturas = result.merged;
+        totalAdded += result.added;
+        totalSkipped += result.skipped;
+      } catch (err) {
+        fileErrors.push(files[i].name + ": " + err.message);
+      }
+    }
+
+    if (session.lecturas.length) {
+      var horas = session.lecturas.map(function (r) { return r.hora; }).filter(Boolean).sort();
+      if (horas.length) {
+        session.horaInicio = session.horaInicio ? (session.horaInicio < horas[0] ? session.horaInicio : horas[0]) : horas[0];
+        session.horaFin = session.horaFin ? (session.horaFin > horas[horas.length - 1] ? session.horaFin : horas[horas.length - 1]) : horas[horas.length - 1];
+      }
+    }
+
+    saveSession();
+    e.target.value = "";
+    renderRecordsHeader();
+    renderRecordsTable();
+
+    var msg = "Se agregaron " + totalAdded + " lectura(s) nueva(s).";
+    if (totalSkipped) msg += " Se omitieron " + totalSkipped + " registro(s) con formato invalido.";
+    if (fileErrors.length) msg += "\n\nNo se pudieron leer:\n" + fileErrors.join("\n");
+    alert(msg);
+  });
+
   // ---------- Print / PDF ----------
 
   document.getElementById("btnPrint").addEventListener("click", function () {

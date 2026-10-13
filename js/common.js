@@ -27,6 +27,31 @@ VP.PRINT_GROUPS = [
   ["Bus", "Carga liviana", "Carga pesada"]
 ];
 
+// ---------- Combinar lecturas de varios dispositivos ----------
+
+// Junta las lecturas existentes con las importadas de un companero, sin
+// duplicar (por id) y descartando registros que no tengan la forma esperada
+// (por si se importa un archivo equivocado). Reimportar el mismo archivo
+// dos veces no duplica nada: el id ya existente simplemente se sobreescribe.
+VP.mergeLecturas = function (existing, incoming) {
+  var byId = {};
+  existing.forEach(function (r) { byId[r.id] = r; });
+  var added = 0, skipped = 0;
+  incoming.forEach(function (r) {
+    var valid = r && typeof r.id === "string" &&
+      VP.CATEGORIES.indexOf(r.categoria) !== -1 &&
+      typeof r.tiempo === "number" && r.tiempo > 0 &&
+      typeof r.distancia === "number" && r.distancia > 0 &&
+      typeof r.velocidad === "number";
+    if (!valid) { skipped++; return; }
+    if (!byId[r.id]) added++;
+    byId[r.id] = r;
+  });
+  var merged = Object.keys(byId).map(function (id) { return byId[id]; });
+  merged.sort(function (a, b) { return parseInt(a.id, 10) - parseInt(b.id, 10); });
+  return { merged: merged, added: added, skipped: skipped, total: merged.length };
+};
+
 // ---------- Estadistica ----------
 
 VP.mean = function (arr) {

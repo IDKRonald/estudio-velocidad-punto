@@ -16,6 +16,10 @@
 
 * { box-sizing: border-box; }
 
+/* El atributo [hidden] debe ganarle a cualquier regla de autor que ponga
+   display en el mismo elemento (si no, "hidden" deja de ocultar). */
+[hidden] { display: none !important; }
+
 html, body {
   margin: 0;
   padding: 0;
@@ -77,8 +81,6 @@ body { padding-bottom: 24px; }
   top: 0;
   z-index: 9;
 }
-
-.install-banner[hidden] { display: none; }
 
 .install-banner span { flex: 1; }
 
@@ -321,6 +323,18 @@ input:focus, select:focus {
 
 .table-wrap { overflow-x: auto; }
 
+.sync-section {
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.sync-section h3 {
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+  color: var(--primary);
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -358,10 +372,6 @@ tbody tr:hover {
   justify-content: center;
   padding: 16px;
   z-index: 50;
-}
-
-.modal-backdrop[hidden] {
-  display: none;
 }
 
 .modal-backdrop { animation: backdrop-in 0.15s ease; }

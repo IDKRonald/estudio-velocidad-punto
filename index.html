@@ -116,6 +116,20 @@
         <button type="button" class="btn btn-ghost" id="btnExportExcel">Exportar Excel</button>
         <button type="button" class="btn btn-ghost" id="btnPrint">Imprimir / PDF</button>
       </div>
+
+      <div class="sync-section">
+        <h3>Compartir lecturas con el equipo</h3>
+        <p class="muted small">
+          Cada companero mide algunas categorias y exporta sus lecturas. Al importar su archivo
+          aqui, se suman a las tuyas sin perder nada (se puede importar el mismo archivo dos veces
+          sin duplicar datos).
+        </p>
+        <div class="actions">
+          <button type="button" class="btn btn-ghost" id="btnExportJson">Exportar lecturas (.json)</button>
+          <button type="button" class="btn btn-ghost" id="btnImportJson">Importar lecturas (.json)</button>
+        </div>
+        <input type="file" id="importFileInput" accept=".json,application/json" multiple hidden>
+      </div>
     </div>
   </section>
 

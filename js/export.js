@@ -266,4 +266,29 @@
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
+
+  // ---------- Compartir lecturas entre dispositivos (.json) ----------
+  // Formato propio de la app, pensado para repartir el trabajo de campo:
+  // cada companero mide algunas categorias y exporta su .json; al
+  // importarlo en otro telefono, las lecturas se combinan (VP.mergeLecturas)
+  // sin perder lo que ya habia ahi.
+
+  VP.downloadSessionJson = function (session) {
+    var payload = {
+      formato: "estudio-velocidad-punto",
+      version: 1,
+      exportadoEn: new Date().toISOString(),
+      session: session
+    };
+    var blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    var equipo = (session.equipo || "equipo").trim().replace(/\s+/g, "-");
+    a.href = url;
+    a.download = "lecturas_" + (session.fecha || "sesion") + "_" + equipo + ".json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 })();
