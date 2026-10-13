@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#1e3a5f">
+<title>Estudio de Velocidad Punto</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <button id="btnMenuNav" class="icon-btn" title="Menu principal" hidden>&#9776;</button>
+  <h1 id="topTitle">Estudio de Velocidad Punto</h1>
+  <div class="topbar-right">
+    <button id="btnDashboardNav" class="icon-btn" title="Ver dashboard" hidden>&#128202;</button>
+    <button id="btnRecordsNav" class="icon-btn" title="Ver registros" hidden>&#128203;</button>
+  </div>
+</header>
+
+<div id="installBanner" class="install-banner" hidden>
+  <span id="installText">Instala esta app en tu celular para usarla sin conexion.</span>
+  <button type="button" id="btnInstallApp" class="install-btn">Instalar</button>
+  <button type="button" id="btnInstallDismiss" class="install-dismiss" aria-label="Cerrar">&times;</button>
+</div>
+
+<main id="app">
+
+  <!-- VISTA: Configuracion de sesion -->
+  <section id="view-session" class="view">
+    <form id="formSession" class="card">
+      <h2>Datos del estudio</h2>
+      <p class="hint">Universidad Nacional de Colombia &ndash; Facultad de Minas<br>Ingenieria de Transito &ndash; Estudio de velocidad punto</p>
+
+      <label>Fecha
+        <input type="date" id="f-fecha" required>
+      </label>
+      <label>Equipo
+        <input type="text" id="f-equipo" placeholder="Numero / nombre del equipo">
+      </label>
+      <label>Localizacion
+        <input type="text" id="f-localizacion" placeholder="Via, abscisa, punto de referencia" required>
+      </label>
+      <label>Sentido
+        <input type="text" id="f-sentido" placeholder="Ej: Norte - Sur">
+      </label>
+      <label>Longitud del tramo (m)
+        <input type="number" id="f-longitud" min="0.1" step="0.01" placeholder="Distancia previamente calculada" required>
+      </label>
+
+      <div class="actions">
+        <button type="submit" class="btn btn-primary" id="btnStartSession">Iniciar / continuar sesion</button>
+        <button type="button" class="btn btn-ghost" id="btnNewSession" hidden>Nueva sesion (borra datos actuales)</button>
+      </div>
+      <p class="muted small">Los datos se guardan localmente en este dispositivo. No requiere conexion a internet.</p>
+    </form>
+  </section>
+
+  <!-- VISTA: Menu principal / seleccion de categoria -->
+  <section id="view-menu" class="view">
+    <div class="card">
+      <h2>Seleccione la categoria del vehiculo</h2>
+      <p class="muted small" id="sessionSummary"></p>
+      <div class="category-grid" id="categoryGrid"></div>
+    </div>
+  </section>
+
+  <!-- VISTA: Cronometro -->
+  <section id="view-stopwatch" class="view">
+    <div class="card stopwatch-card">
+      <p class="muted">Vehiculo: <strong id="swCategoryLabel"></strong> &middot; Lectura No. <strong id="swLecturaLabel"></strong> &middot; Tramo: <strong id="swDistanceLabel"></strong> m</p>
+      <div class="timer-display" id="timerDisplay">00:00.00</div>
+      <div class="sw-buttons">
+        <button type="button" class="btn btn-primary" id="btnStart">Iniciar</button>
+        <button type="button" class="btn btn-warn" id="btnPause" hidden>Pausar</button>
+        <button type="button" class="btn btn-primary" id="btnResume" hidden>Reanudar</button>
+        <button type="button" class="btn btn-ghost" id="btnReset">Reiniciar</button>
+      </div>
+      <p class="muted small" id="speedPreview"></p>
+      <div class="actions">
+        <button type="button" class="btn btn-ghost" id="btnCancelReading">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="btnSaveReading" disabled>Guardar lectura</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- VISTA: Registros -->
+  <section id="view-records" class="view">
+    <div class="card">
+      <h2>Registros del estudio</h2>
+      <div id="recordsHeader" class="records-header"></div>
+
+      <div class="table-wrap">
+        <table id="recordsTable">
+          <thead>
+            <tr>
+              <th>No. Lectura</th>
+              <th>Hora</th>
+              <th>Tipo vehiculo</th>
+              <th>Distancia (m)</th>
+              <th>Tiempo (s)</th>
+              <th>Velocidad (km/h)</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="recordsBody"></tbody>
+        </table>
+      </div>
+      <p class="muted small" id="recordsEmpty" hidden>Aun no hay lecturas registradas.</p>
+
+      <div class="actions">
+        <button type="button" class="btn btn-ghost" id="btnBackToMenu">Volver al menu</button>
+        <button type="button" class="btn btn-ghost" id="btnExportExcel">Exportar Excel</button>
+        <button type="button" class="btn btn-ghost" id="btnPrint">Imprimir / PDF</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- VISTA: Dashboard -->
+  <section id="view-dashboard" class="view">
+    <div class="card">
+      <h2>Dashboard de velocidades</h2>
+      <p class="muted small">Media, desviacion y curva de distribucion normal por tipo de vehiculo.</p>
+      <div id="dashboardContent" class="dashboard-grid"></div>
+      <div class="actions">
+        <button type="button" class="btn btn-ghost" id="btnDashboardBack">Volver al menu</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- MODAL: editar registro -->
+<div id="editModal" class="modal-backdrop" hidden>
+  <div class="modal card">
+    <h2>Editar lectura</h2>
+    <label>Tipo de vehiculo
+      <select id="e-categoria"></select>
+    </label>
+    <label>Distancia (m)
+      <input type="number" id="e-distancia" min="0.1" step="0.01">
+    </label>
+    <label>Tiempo (s)
+      <input type="number" id="e-tiempo" min="0.01" step="0.01">
+    </label>
+    <div class="actions">
+      <button type="button" class="btn btn-ghost" id="btnEditCancel">Cancelar</button>
+      <button type="button" class="btn btn-primary" id="btnEditSave">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- Zona de impresion (formato tipo informe) -->
+<div id="printArea" class="print-only"></div>
+
+<script src="js/vendor/exceljs.min.js"></script>
+<script src="js/vendor/chart.umd.min.js"></script>
+<script src="js/common.js"></script>
+<script src="js/export.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
