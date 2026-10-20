@@ -280,7 +280,23 @@
     goToMovimientoPicker();
   }
 
+  // Reinicia el reloj del aforo activo desde "ahora" (p. ej. si se inicio
+  // por error antes de llegar al punto). Descarta los conteos ya hechos.
+  function reiniciarTiempoAforo() {
+    var aforo = findActiveAforo();
+    if (!aforo) return;
+    if (!confirm("Reiniciar el tiempo desde ahora? Se borraran los conteos de este aforo.")) return;
+    var now = new Date();
+    aforo.inicioMs = now.getTime();
+    aforo.horaInicio = fmtHora(now);
+    aforo.intervalos = [];
+    ensureIntervalsUpTo(aforo, 0);
+    saveVolumenSession();
+    renderConteo();
+  }
+
   document.getElementById("btnFinalizarAforo").addEventListener("click", finalizarAforo);
+  document.getElementById("btnReiniciarTiempo").addEventListener("click", reiniciarTiempoAforo);
 
   // ---------- Ver conteos (correccion + multi-aforo) ----------
 
