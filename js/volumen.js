@@ -125,19 +125,27 @@
     showVolumenView("view-volumen-movimiento");
   }
 
+  function fmtHora(date) {
+    return date.toTimeString().slice(0, 8);
+  }
+
+  function emptyCounts() {
+    return { Particular: 0, Moto: 0, Taxi: 0, Bus: 0, "Carga liviana": 0, "Carga pesada": 0 };
+  }
+
   function selectMovimiento(key) {
     var now = new Date();
     var aforo = {
       id: Date.now() + "_" + Math.random().toString(36).slice(2, 7),
       movimiento: key,
       inicioMs: now.getTime(),
-      horaInicio: now.toTimeString().slice(0, 8),
+      horaInicio: fmtHora(now),
       horaFin: null,
       intervalos: [
         {
-          inicio: now.toTimeString().slice(0, 8),
-          fin: new Date(now.getTime() + 15 * 60 * 1000).toTimeString().slice(0, 8),
-          counts: { Particular: 0, Moto: 0, Taxi: 0, Bus: 0, "Carga liviana": 0, "Carga pesada": 0 }
+          inicio: fmtHora(now),
+          fin: fmtHora(new Date(now.getTime() + 15 * 60 * 1000)),
+          counts: emptyCounts()
         }
       ]
     };
@@ -146,19 +154,117 @@
     goToConteo();
   }
 
-  // ---------- Conteo (stub -- Task 2 implements the real tally screen) ----------
+  // ---------- Conteo ----------
+
+  var conteoTimerId = null;
+
+  function findActiveAforo() {
+    for (var i = session.aforos.length - 1; i >= 0; i--) {
+      if (!session.aforos[i].horaFin) return session.aforos[i];
+    }
+    return null;
+  }
+
+  function currentIntervalIndex(aforo) {
+    return Math.floor((Date.now() - aforo.inicioMs) / (15 * 60 * 1000));
+  }
+
+  // Devuelve true si agrego algun intervalo nuevo (para que el llamador sepa
+  // si hace falta guardar).
+  function ensureIntervalsUpTo(aforo, index) {
+    var added = false;
+    while (aforo.intervalos.length <= index) {
+      var n = aforo.intervalos.length;
+      var startMs = aforo.inicioMs + n * 15 * 60 * 1000;
+      var endMs = startMs + 15 * 60 * 1000;
+      aforo.intervalos.push({
+        inicio: fmtHora(new Date(startMs)),
+        fin: fmtHora(new Date(endMs)),
+        counts: emptyCounts()
+      });
+      added = true;
+    }
+    return added;
+  }
+
+  function buildTallyGridOnce() {
+    var grid = document.getElementById("tallyGrid");
+    if (grid.children.length) return;
+    VP.CATEGORIES.forEach(function (cat) {
+      var card = document.createElement("div");
+      card.className = "tally-card";
+      card.innerHTML =
+        "<div class='tally-label'>" + cat + "</div>" +
+        "<div class='tally-count' data-tally-count='" + cat + "'>0</div>" +
+        "<div class='tally-buttons'>" +
+          "<button type='button' class='btn btn-ghost tally-minus'>-1</button>" +
+          "<button type='button' class='btn btn-primary tally-plus'>+1</button>" +
+        "</div>";
+      card.querySelector(".tally-plus").addEventListener("click", function () { changeCount(cat, 1); });
+      card.querySelector(".tally-minus").addEventListener("click", function () { changeCount(cat, -1); });
+      grid.appendChild(card);
+    });
+  }
+
+  function renderConteo() {
+    var aforo = findActiveAforo();
+    if (!aforo) {
+      goToMovimientoPicker();
+      return;
+    }
+    var idx = currentIntervalIndex(aforo);
+    if (ensureIntervalsUpTo(aforo, idx)) saveVolumenSession();
+    var interval = aforo.intervalos[idx];
+    document.getElementById("conteoMovimientoLabel").textContent = movimientoLabel(aforo.movimiento);
+    document.getElementById("conteoIntervaloLabel").textContent = interval.inicio + " - " + interval.fin;
+    VP.CATEGORIES.forEach(function (cat) {
+      document.querySelector("[data-tally-count='" + cat + "']").textContent = interval.counts[cat];
+    });
+  }
 
   function goToConteo() {
-    var aforo = session.aforos[session.aforos.length - 1];
-    document.getElementById("conteoMovimientoLabel").textContent = movimientoLabel(aforo.movimiento);
+    buildTallyGridOnce();
+    renderConteo();
+    if (conteoTimerId) clearInterval(conteoTimerId);
+    conteoTimerId = setInterval(renderConteo, 1000);
     showVolumenView("view-volumen-conteo");
   }
+
+  function changeCount(categoria, delta) {
+    var aforo = findActiveAforo();
+    if (!aforo) return;
+    var idx = currentIntervalIndex(aforo);
+    ensureIntervalsUpTo(aforo, idx);
+    var interval = aforo.intervalos[idx];
+    interval.counts[categoria] = Math.max(0, interval.counts[categoria] + delta);
+    saveVolumenSession();
+    renderConteo();
+  }
+
+  function finalizarAforo() {
+    var aforo = findActiveAforo();
+    if (!aforo) return;
+    aforo.horaFin = fmtHora(new Date());
+    saveVolumenSession();
+    if (conteoTimerId) {
+      clearInterval(conteoTimerId);
+      conteoTimerId = null;
+    }
+    goToMovimientoPicker();
+  }
+
+  document.getElementById("btnFinalizarAforo").addEventListener("click", finalizarAforo);
 
   // ---------- Init ----------
 
   VP.volumen = {
     init: function () {
-      initVolumenSessionView();
+      session = loadVolumenSession();
+      if (session && findActiveAforo()) {
+        goToConteo();
+      } else {
+        initVolumenSessionView();
+      }
     }
   };
 })();
