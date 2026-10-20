@@ -27,6 +27,24 @@ VP.PRINT_GROUPS = [
   ["Bus", "Carga liviana", "Carga pesada"]
 ];
 
+// Los 12 movimientos posibles de una glorieta (estudio de Volumen), por
+// acceso 1-4, cada uno con Entrada (X)/Interno (Y)/Salida (Z) -- ver
+// Ilustracion 1 de la guia de practica.
+VP.MOVIMIENTOS = [
+  { key: "X1", label: "Entrada 1 (X₁)" },
+  { key: "Y1", label: "Interno 1 (Y₁)" },
+  { key: "Z1", label: "Salida 1 (Z₁)" },
+  { key: "X2", label: "Entrada 2 (X₂)" },
+  { key: "Y2", label: "Interno 2 (Y₂)" },
+  { key: "Z2", label: "Salida 2 (Z₂)" },
+  { key: "X3", label: "Entrada 3 (X₃)" },
+  { key: "Y3", label: "Interno 3 (Y₃)" },
+  { key: "Z3", label: "Salida 3 (Z₃)" },
+  { key: "X4", label: "Entrada 4 (X₄)" },
+  { key: "Y4", label: "Interno 4 (Y₄)" },
+  { key: "Z4", label: "Salida 4 (Z₄)" }
+];
+
 // ---------- Combinar lecturas de varios dispositivos ----------
 
 // Junta las lecturas existentes con las importadas de un companero, sin

@@ -6,6 +6,8 @@ var ASSETS = [
   "./js/common.js",
   "./js/export.js",
   "./js/app.js",
+  "./js/volumen.js",
+  "./js/main.js",
   "./js/vendor/exceljs.min.js",
   "./js/vendor/chart.umd.min.js",
   "./manifest.json",

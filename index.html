@@ -12,12 +12,26 @@
 </head>
 <body>
 
+<!-- VISTA: Elegir tipo de estudio -->
+<div id="studytype-screen">
+  <div class="card studytype-card">
+    <h2>&#191;Que estudio vas a hacer?</h2>
+    <div class="actions">
+      <button type="button" class="btn btn-primary" id="btnChooseVelocidad">Velocidad punto</button>
+      <button type="button" class="btn btn-primary" id="btnChooseVolumen">Volumen vehicular (glorieta)</button>
+    </div>
+  </div>
+</div>
+
+<div id="velocidad-app" hidden>
+
 <header class="topbar">
   <button id="btnMenuNav" class="icon-btn" title="Menu principal" hidden>&#9776;</button>
   <h1 id="topTitle">Estudio de Velocidad Punto</h1>
   <div class="topbar-right">
     <button id="btnDashboardNav" class="icon-btn" title="Ver dashboard" hidden>&#128202;</button>
     <button id="btnRecordsNav" class="icon-btn" title="Ver registros" hidden>&#128203;</button>
+    <button id="btnChangeStudyVelocidad" class="icon-btn" title="Cambiar estudio">&#8617;</button>
   </div>
 </header>
 
@@ -170,10 +184,68 @@
 <!-- Zona de impresion (formato tipo informe) -->
 <div id="printArea" class="print-only"></div>
 
+</div><!-- /#velocidad-app -->
+
+<div id="volumen-app" hidden>
+
+<header class="topbar">
+  <h1>Volumen Vehicular</h1>
+  <div class="topbar-right">
+    <button id="btnChangeStudyVolumen" class="icon-btn" title="Cambiar estudio">&#8617;</button>
+  </div>
+</header>
+
+<main id="volumen-content">
+
+  <!-- VISTA: Datos del estudio (Volumen) -->
+  <section id="view-volumen-session" class="vol-view">
+    <form id="formVolumenSession" class="card">
+      <h2>Datos del estudio</h2>
+      <p class="hint">Universidad Nacional de Colombia &ndash; Facultad de Minas<br>Ingenieria de Transito &ndash; Estudio de volumen vehicular</p>
+
+      <label>Fecha
+        <input type="date" id="v-fecha" required>
+      </label>
+      <label>Equipo
+        <input type="text" id="v-equipo" placeholder="Numero / nombre del equipo">
+      </label>
+      <label>Ubicacion
+        <input type="text" id="v-ubicacion" placeholder="Glorieta, interseccion, via" required>
+      </label>
+
+      <div class="actions">
+        <button type="submit" class="btn btn-primary" id="btnStartVolumenSession">Iniciar / continuar sesion</button>
+        <button type="button" class="btn btn-ghost" id="btnNewVolumenSession" hidden>Nueva sesion (borra datos actuales)</button>
+      </div>
+      <p class="muted small">Los datos se guardan localmente en este dispositivo. No requiere conexion a internet.</p>
+    </form>
+  </section>
+
+  <!-- VISTA: Elegir movimiento -->
+  <section id="view-volumen-movimiento" class="vol-view">
+    <div class="card">
+      <h2>Seleccione el movimiento</h2>
+      <div class="category-grid" id="movimientoGrid"></div>
+    </div>
+  </section>
+
+  <!-- VISTA: Conteo -->
+  <section id="view-volumen-conteo" class="vol-view">
+    <div class="card">
+      <p class="muted">Movimiento: <strong id="conteoMovimientoLabel"></strong></p>
+    </div>
+  </section>
+
+</main>
+
+</div><!-- /#volumen-app -->
+
 <script src="js/vendor/exceljs.min.js"></script>
 <script src="js/vendor/chart.umd.min.js"></script>
 <script src="js/common.js"></script>
 <script src="js/export.js"></script>
 <script src="js/app.js"></script>
+<script src="js/volumen.js"></script>
+<script src="js/main.js"></script>
 </body>
 </html>

@@ -108,7 +108,7 @@ body { padding-bottom: 24px; }
   cursor: pointer;
 }
 
-main {
+main, #volumen-content {
   max-width: 640px;
   margin: 0 auto;
   padding: 16px;
@@ -116,6 +116,18 @@ main {
 
 .view { display: none; }
 .view.active { display: block; animation: fade-in 0.2s ease; }
+
+.vol-view { display: none; }
+.vol-view.active { display: block; animation: fade-in 0.2s ease; }
+
+#studytype-screen {
+  max-width: 480px;
+  margin: 48px auto;
+  padding: 0 16px;
+}
+
+.studytype-card { text-align: center; }
+.studytype-card .actions { flex-direction: column; }
 
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(4px); }
