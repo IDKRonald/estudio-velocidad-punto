@@ -70,6 +70,25 @@ VP.mergeLecturas = function (existing, incoming) {
   return { merged: merged, added: added, skipped: skipped, total: merged.length };
 };
 
+// Igual que VP.mergeLecturas pero para aforos del estudio de Volumen.
+VP.mergeAforos = function (existing, incoming) {
+  var byId = {};
+  existing.forEach(function (a) { byId[a.id] = a; });
+  var movimientoKeys = VP.MOVIMIENTOS.map(function (m) { return m.key; });
+  var added = 0, skipped = 0;
+  incoming.forEach(function (a) {
+    var valid = a && typeof a.id === "string" &&
+      movimientoKeys.indexOf(a.movimiento) !== -1 &&
+      Array.isArray(a.intervalos);
+    if (!valid) { skipped++; return; }
+    if (!byId[a.id]) added++;
+    byId[a.id] = a;
+  });
+  var merged = Object.keys(byId).map(function (id) { return byId[id]; });
+  merged.sort(function (a, b) { return parseInt(a.id, 10) - parseInt(b.id, 10); });
+  return { merged: merged, added: added, skipped: skipped, total: merged.length };
+};
+
 // ---------- Estadistica ----------
 
 VP.mean = function (arr) {

@@ -342,6 +342,51 @@
   document.getElementById("btnVolumenRecordsNav").addEventListener("click", goToRegistros);
   document.getElementById("btnVolumenRecordsBack").addEventListener("click", goToMovimientoPicker);
 
+  // ---------- Compartir aforos con el equipo (.json) ----------
+
+  document.getElementById("btnExportVolumenJson").addEventListener("click", function () {
+    VP.downloadVolumenSessionJson(session);
+  });
+
+  document.getElementById("btnImportVolumenJson").addEventListener("click", function () {
+    document.getElementById("volumenImportFileInput").click();
+  });
+
+  document.getElementById("volumenImportFileInput").addEventListener("change", async function (e) {
+    var files = Array.prototype.slice.call(e.target.files || []);
+    if (!files.length) return;
+
+    var totalAdded = 0;
+    var totalSkipped = 0;
+    var fileErrors = [];
+
+    for (var i = 0; i < files.length; i++) {
+      try {
+        var text = await files[i].text();
+        var data = JSON.parse(text);
+        var incomingSession = data && data.session ? data.session : data;
+        if (!data || data.formato !== "estudio-volumen-vehicular" || !incomingSession || !Array.isArray(incomingSession.aforos)) {
+          throw new Error("no tiene el formato esperado");
+        }
+        var result = VP.mergeAforos(session.aforos, incomingSession.aforos);
+        session.aforos = result.merged;
+        totalAdded += result.added;
+        totalSkipped += result.skipped;
+      } catch (err) {
+        fileErrors.push(files[i].name + ": " + err.message);
+      }
+    }
+
+    saveVolumenSession();
+    e.target.value = "";
+    renderAforoSelector();
+
+    var msg = "Se agregaron " + totalAdded + " aforo(s) nuevo(s).";
+    if (totalSkipped) msg += " Se omitieron " + totalSkipped + " registro(s) con formato invalido.";
+    if (fileErrors.length) msg += "\n\nNo se pudieron leer:\n" + fileErrors.join("\n");
+    alert(msg);
+  });
+
   // ---------- Init ----------
 
   VP.volumen = {

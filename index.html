@@ -271,6 +271,20 @@
         <button type="button" class="btn btn-ghost" id="btnVolumenRecordsBack">Volver</button>
         <button type="button" class="btn btn-ghost" id="btnEliminarAforo">Eliminar aforo</button>
       </div>
+
+      <div class="sync-section">
+        <h3>Compartir aforos con el equipo</h3>
+        <p class="muted small">
+          Cada companero cuenta algunos movimientos y exporta sus aforos. Al importar su archivo
+          aqui, se suman a los tuyos sin perder nada (se puede importar el mismo archivo dos veces
+          sin duplicar datos).
+        </p>
+        <div class="actions">
+          <button type="button" class="btn btn-ghost" id="btnExportVolumenJson">Exportar aforos (.json)</button>
+          <button type="button" class="btn btn-ghost" id="btnImportVolumenJson">Importar aforos (.json)</button>
+        </div>
+        <input type="file" id="volumenImportFileInput" accept=".json,application/json" multiple hidden>
+      </div>
     </div>
   </section>
 
