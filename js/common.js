@@ -70,7 +70,13 @@ VP.mergeLecturas = function (existing, incoming) {
   return { merged: merged, added: added, skipped: skipped, total: merged.length };
 };
 
-// Igual que VP.mergeLecturas pero para aforos del estudio de Volumen.
+// Igual que VP.mergeLecturas pero para aforos del estudio de Volumen, con
+// una diferencia clave: a diferencia de una lectura (un evento que se
+// escribe una sola vez), un aforo sigue creciendo y cambia de estado
+// (abierto -> finalizado) en el dispositivo que lo inicio. Si el mismo id
+// ya existe localmente, la copia local siempre gana -- nunca se sobreescribe
+// con una version entrante, que podria ser una version vieja/sin terminar
+// de ese mismo aforo (ej. un companero reenvia un export desactualizado).
 VP.mergeAforos = function (existing, incoming) {
   var byId = {};
   existing.forEach(function (a) { byId[a.id] = a; });
@@ -79,10 +85,15 @@ VP.mergeAforos = function (existing, incoming) {
   incoming.forEach(function (a) {
     var valid = a && typeof a.id === "string" &&
       movimientoKeys.indexOf(a.movimiento) !== -1 &&
-      Array.isArray(a.intervalos);
+      typeof a.inicioMs === "number" && isFinite(a.inicioMs) &&
+      Array.isArray(a.intervalos) &&
+      a.intervalos.every(function (iv) {
+        return iv && typeof iv === "object" && iv.counts && typeof iv.counts === "object";
+      });
     if (!valid) { skipped++; return; }
-    if (!byId[a.id]) added++;
+    if (byId[a.id]) return; // ya existe localmente: la copia local manda
     byId[a.id] = a;
+    added++;
   });
   var merged = Object.keys(byId).map(function (id) { return byId[id]; });
   merged.sort(function (a, b) { return parseInt(a.id, 10) - parseInt(b.id, 10); });

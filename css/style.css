@@ -259,6 +259,17 @@ input:focus, select:focus {
   margin-top: 16px;
 }
 
+/* Grilla de movimientos: 3 columnas para que cada fila sea un acceso
+   completo (Entrada/Interno/Salida), como pide la guia. */
+.movimiento-grid {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.movimiento-grid .cat-btn {
+  padding: 16px 6px;
+  font-size: 0.85rem;
+}
+
 .cat-btn {
   padding: 22px 10px;
   border-radius: var(--radius);

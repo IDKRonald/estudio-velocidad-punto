@@ -640,6 +640,7 @@
   // ---------- Cambiar estudio ----------
 
   document.getElementById("btnChangeStudyVelocidad").addEventListener("click", function () {
+    resetStopwatch();
     VP.goToStudyTypeChooser();
   });
 

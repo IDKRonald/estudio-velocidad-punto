@@ -12,6 +12,14 @@
 </head>
 <body>
 
+<!-- Banner de instalacion: visible en cualquier pantalla (chooser, Velocidad
+     o Volumen), no solo dentro de un estudio ya elegido. -->
+<div id="installBanner" class="install-banner" hidden>
+  <span id="installText">Instala esta app en tu celular para usarla sin conexion.</span>
+  <button type="button" id="btnInstallApp" class="install-btn">Instalar</button>
+  <button type="button" id="btnInstallDismiss" class="install-dismiss" aria-label="Cerrar">&times;</button>
+</div>
+
 <!-- VISTA: Elegir tipo de estudio -->
 <div id="studytype-screen">
   <div class="card studytype-card">
@@ -34,12 +42,6 @@
     <button id="btnChangeStudyVelocidad" class="icon-btn" title="Cambiar estudio">&#8617;</button>
   </div>
 </header>
-
-<div id="installBanner" class="install-banner" hidden>
-  <span id="installText">Instala esta app en tu celular para usarla sin conexion.</span>
-  <button type="button" id="btnInstallApp" class="install-btn">Instalar</button>
-  <button type="button" id="btnInstallDismiss" class="install-dismiss" aria-label="Cerrar">&times;</button>
-</div>
 
 <main id="app">
 
@@ -226,7 +228,7 @@
   <section id="view-volumen-movimiento" class="vol-view">
     <div class="card">
       <h2>Seleccione el movimiento</h2>
-      <div class="category-grid" id="movimientoGrid"></div>
+      <div class="category-grid movimiento-grid" id="movimientoGrid"></div>
     </div>
   </section>
 

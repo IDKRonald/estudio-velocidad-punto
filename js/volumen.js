@@ -29,6 +29,10 @@
   // ---------- View routing ----------
 
   function showVolumenView(id) {
+    // El aforo activo avanza su intervalo por reloj: si no estas viendo el
+    // conteo, el tick no debe seguir corriendo ni pudiendo expulsarte de
+    // cualquier otra pantalla cuando el aforo activo cambie.
+    if (id !== "view-volumen-conteo") stopConteoTimer();
     document.querySelectorAll("#volumen-app .vol-view").forEach(function (v) {
       v.classList.toggle("active", v.id === id);
     });
@@ -81,7 +85,8 @@
         fecha: fecha,
         equipo: equipo,
         ubicacion: ubicacion,
-        aforos: []
+        aforos: [],
+        activeAforoId: null
       };
     } else {
       session.fecha = fecha;
@@ -101,6 +106,7 @@
   });
 
   document.getElementById("btnChangeStudyVolumen").addEventListener("click", function () {
+    stopConteoTimer();
     VP.goToStudyTypeChooser();
   });
 
@@ -122,6 +128,13 @@
   }
 
   function goToMovimientoPicker() {
+    // Si hay un aforo activo (sin finalizar), no se puede "perder" navegando:
+    // cualquier camino que llegaria al selector de movimiento vuelve al
+    // conteo en curso hasta que se finalice o se elimine explicitamente.
+    if (findActiveAforo()) {
+      goToConteo();
+      return;
+    }
     buildMovimientoGridOnce();
     showVolumenView("view-volumen-movimiento");
   }
@@ -135,6 +148,11 @@
   }
 
   function selectMovimiento(key) {
+    if (session.activeAforoId) {
+      // Ya hay un aforo sin finalizar: no se crea uno nuevo por encima.
+      goToConteo();
+      return;
+    }
     var now = new Date();
     var aforo = {
       id: Date.now() + "_" + Math.random().toString(36).slice(2, 7),
@@ -151,6 +169,7 @@
       ]
     };
     session.aforos.push(aforo);
+    session.activeAforoId = aforo.id;
     saveVolumenSession();
     goToConteo();
   }
@@ -159,11 +178,20 @@
 
   var conteoTimerId = null;
 
-  function findActiveAforo() {
-    for (var i = session.aforos.length - 1; i >= 0; i--) {
-      if (!session.aforos[i].horaFin) return session.aforos[i];
+  function stopConteoTimer() {
+    if (conteoTimerId) {
+      clearInterval(conteoTimerId);
+      conteoTimerId = null;
     }
-    return null;
+  }
+
+  // El aforo activo es el que ESTE dispositivo inicio (session.activeAforoId),
+  // nunca inferido de horaFin===null: un aforo importado de un companero
+  // puede llegar sin finalizar y no por eso debe "tomar control" del conteo
+  // de este telefono.
+  function findActiveAforo() {
+    if (!session.activeAforoId) return null;
+    return session.aforos.filter(function (a) { return a.id === session.activeAforoId; })[0] || null;
   }
 
   function currentIntervalIndex(aforo) {
@@ -226,7 +254,7 @@
   function goToConteo() {
     buildTallyGridOnce();
     renderConteo();
-    if (conteoTimerId) clearInterval(conteoTimerId);
+    stopConteoTimer();
     conteoTimerId = setInterval(renderConteo, 1000);
     showVolumenView("view-volumen-conteo");
   }
@@ -246,11 +274,9 @@
     var aforo = findActiveAforo();
     if (!aforo) return;
     aforo.horaFin = fmtHora(new Date());
+    session.activeAforoId = null;
     saveVolumenSession();
-    if (conteoTimerId) {
-      clearInterval(conteoTimerId);
-      conteoTimerId = null;
-    }
+    stopConteoTimer();
     goToMovimientoPicker();
   }
 
@@ -323,10 +349,9 @@
   function eliminarAforoActual() {
     if (!selectedAforoId) return;
     if (!confirm("¿Eliminar este aforo completo?")) return;
-    var active = findActiveAforo();
-    if (active && active.id === selectedAforoId && conteoTimerId) {
-      clearInterval(conteoTimerId);
-      conteoTimerId = null;
+    if (session.activeAforoId === selectedAforoId) {
+      session.activeAforoId = null;
+      stopConteoTimer();
     }
     session.aforos = session.aforos.filter(function (a) { return a.id !== selectedAforoId; });
     selectedAforoId = null;
