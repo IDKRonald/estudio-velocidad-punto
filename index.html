@@ -191,6 +191,7 @@
 <header class="topbar">
   <h1>Volumen Vehicular</h1>
   <div class="topbar-right">
+    <button id="btnVolumenRecordsNav" class="icon-btn" title="Ver conteos" hidden>&#128203;</button>
     <button id="btnChangeStudyVolumen" class="icon-btn" title="Cambiar estudio">&#8617;</button>
   </div>
 </header>
@@ -237,6 +238,38 @@
       <div id="tallyGrid" class="tally-grid"></div>
       <div class="actions">
         <button type="button" class="btn btn-ghost" id="btnFinalizarAforo">Finalizar aforo</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- VISTA: Ver conteos -->
+  <section id="view-volumen-registros" class="vol-view">
+    <div class="card">
+      <h2>Ver conteos</h2>
+      <label>Aforo (movimiento)
+        <select id="aforoSelect"></select>
+      </label>
+
+      <div class="table-wrap">
+        <table id="registrosTable">
+          <thead>
+            <tr>
+              <th>Intervalo</th>
+              <th>Particular</th>
+              <th>Moto</th>
+              <th>Taxi</th>
+              <th>Bus</th>
+              <th>Carga liviana</th>
+              <th>Carga pesada</th>
+            </tr>
+          </thead>
+          <tbody id="registrosBody"></tbody>
+        </table>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn btn-ghost" id="btnVolumenRecordsBack">Volver</button>
+        <button type="button" class="btn btn-ghost" id="btnEliminarAforo">Eliminar aforo</button>
       </div>
     </div>
   </section>

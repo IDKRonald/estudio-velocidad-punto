@@ -32,6 +32,7 @@
     document.querySelectorAll("#volumen-app .vol-view").forEach(function (v) {
       v.classList.toggle("active", v.id === id);
     });
+    document.getElementById("btnVolumenRecordsNav").hidden = (id === "view-volumen-session");
   }
 
   // ---------- Movimiento helpers ----------
@@ -254,6 +255,92 @@
   }
 
   document.getElementById("btnFinalizarAforo").addEventListener("click", finalizarAforo);
+
+  // ---------- Ver conteos (correccion + multi-aforo) ----------
+
+  var selectedAforoId = null;
+
+  function goToRegistros() {
+    renderAforoSelector();
+    showVolumenView("view-volumen-registros");
+  }
+
+  function renderAforoSelector() {
+    var sel = document.getElementById("aforoSelect");
+    sel.innerHTML = "";
+    session.aforos.forEach(function (a) {
+      var opt = document.createElement("option");
+      opt.value = a.id;
+      opt.textContent = movimientoLabel(a.movimiento) + " (" + a.horaInicio + ")";
+      sel.appendChild(opt);
+    });
+    if (!session.aforos.length) {
+      selectedAforoId = null;
+      renderRegistrosTable();
+      return;
+    }
+    if (!selectedAforoId || !session.aforos.some(function (a) { return a.id === selectedAforoId; })) {
+      selectedAforoId = session.aforos[session.aforos.length - 1].id;
+    }
+    sel.value = selectedAforoId;
+    renderRegistrosTable();
+  }
+
+  document.getElementById("aforoSelect").addEventListener("change", function (e) {
+    selectedAforoId = e.target.value;
+    renderRegistrosTable();
+  });
+
+  function renderRegistrosTable() {
+    var tbody = document.getElementById("registrosBody");
+    tbody.innerHTML = "";
+    var aforo = session.aforos.filter(function (a) { return a.id === selectedAforoId; })[0];
+    if (!aforo) return;
+    aforo.intervalos.forEach(function (interval) {
+      var tr = document.createElement("tr");
+      var tdLabel = document.createElement("td");
+      tdLabel.textContent = interval.inicio + " - " + interval.fin;
+      tr.appendChild(tdLabel);
+      VP.CATEGORIES.forEach(function (cat) {
+        var td = document.createElement("td");
+        var input = document.createElement("input");
+        input.type = "number";
+        input.min = "0";
+        input.value = interval.counts[cat];
+        input.addEventListener("change", function () {
+          var val = Math.max(0, parseInt(input.value, 10) || 0);
+          interval.counts[cat] = val;
+          input.value = val;
+          saveVolumenSession();
+        });
+        td.appendChild(input);
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+  }
+
+  function eliminarAforoActual() {
+    if (!selectedAforoId) return;
+    if (!confirm("¿Eliminar este aforo completo?")) return;
+    var active = findActiveAforo();
+    if (active && active.id === selectedAforoId && conteoTimerId) {
+      clearInterval(conteoTimerId);
+      conteoTimerId = null;
+    }
+    session.aforos = session.aforos.filter(function (a) { return a.id !== selectedAforoId; });
+    selectedAforoId = null;
+    saveVolumenSession();
+    if (session.aforos.length) {
+      renderAforoSelector();
+    } else {
+      goToMovimientoPicker();
+    }
+  }
+
+  document.getElementById("btnEliminarAforo").addEventListener("click", eliminarAforoActual);
+  document.getElementById("btnVolumenRecordsNav").addEventListener("click", goToRegistros);
+  document.getElementById("btnVolumenRecordsBack").addEventListener("click", goToMovimientoPicker);
 
   // ---------- Init ----------
 
