@@ -637,10 +637,21 @@
     showInstallBanner("ios");
   }
 
+  // ---------- Cambiar estudio ----------
+
+  document.getElementById("btnChangeStudyVelocidad").addEventListener("click", function () {
+    resetStopwatch();
+    VP.goToStudyTypeChooser();
+  });
+
   // ---------- Init ----------
 
-  buildCategoryGrid();
-  initSessionView();
+  VP.app = {
+    init: function () {
+      buildCategoryGrid();
+      initSessionView();
+    }
+  };
 
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", function () {

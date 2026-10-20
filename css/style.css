@@ -108,7 +108,7 @@ body { padding-bottom: 24px; }
   cursor: pointer;
 }
 
-main {
+main, #volumen-content {
   max-width: 640px;
   margin: 0 auto;
   padding: 16px;
@@ -116,6 +116,45 @@ main {
 
 .view { display: none; }
 .view.active { display: block; animation: fade-in 0.2s ease; }
+
+.vol-view { display: none; }
+.vol-view.active { display: block; animation: fade-in 0.2s ease; }
+
+#studytype-screen {
+  max-width: 480px;
+  margin: 48px auto;
+  padding: 0 16px;
+}
+
+.studytype-card { text-align: center; }
+.studytype-card .actions { flex-direction: column; }
+
+.tally-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.tally-card {
+  background: var(--primary-wash);
+  border-radius: var(--radius);
+  padding: 12px;
+  text-align: center;
+}
+
+.tally-label { font-size: 0.85rem; font-weight: 600; color: var(--primary); }
+.tally-count { font-size: 2rem; font-weight: 700; margin: 6px 0; font-variant-numeric: tabular-nums; }
+
+.tally-buttons { display: flex; gap: 6px; justify-content: center; }
+.tally-buttons .btn { flex: 0 1 auto; padding: 8px 14px; }
+
+#registrosTable input[type="number"] {
+  width: 56px;
+  margin-top: 0;
+  padding: 4px 6px;
+  text-align: center;
+}
 
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(4px); }
@@ -218,6 +257,17 @@ input:focus, select:focus {
   grid-template-columns: 1fr 1fr;
   gap: 12px;
   margin-top: 16px;
+}
+
+/* Grilla de movimientos: 3 columnas para que cada fila sea un acceso
+   completo (Entrada/Interno/Salida), como pide la guia. */
+.movimiento-grid {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.movimiento-grid .cat-btn {
+  padding: 16px 6px;
+  font-size: 0.85rem;
 }
 
 .cat-btn {

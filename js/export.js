@@ -291,4 +291,23 @@
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
+
+  VP.downloadVolumenSessionJson = function (session) {
+    var payload = {
+      formato: "estudio-volumen-vehicular",
+      version: 1,
+      exportadoEn: new Date().toISOString(),
+      session: session
+    };
+    var blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    var equipo = (session.equipo || "equipo").trim().replace(/\s+/g, "-");
+    a.href = url;
+    a.download = "aforos_" + (session.fecha || "sesion") + "_" + equipo + ".json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 })();

@@ -27,6 +27,24 @@ VP.PRINT_GROUPS = [
   ["Bus", "Carga liviana", "Carga pesada"]
 ];
 
+// Los 12 movimientos posibles de una glorieta (estudio de Volumen), por
+// acceso 1-4, cada uno con Entrada (X)/Interno (Y)/Salida (Z) -- ver
+// Ilustracion 1 de la guia de practica.
+VP.MOVIMIENTOS = [
+  { key: "X1", label: "Entrada 1 (X₁)" },
+  { key: "Y1", label: "Interno 1 (Y₁)" },
+  { key: "Z1", label: "Salida 1 (Z₁)" },
+  { key: "X2", label: "Entrada 2 (X₂)" },
+  { key: "Y2", label: "Interno 2 (Y₂)" },
+  { key: "Z2", label: "Salida 2 (Z₂)" },
+  { key: "X3", label: "Entrada 3 (X₃)" },
+  { key: "Y3", label: "Interno 3 (Y₃)" },
+  { key: "Z3", label: "Salida 3 (Z₃)" },
+  { key: "X4", label: "Entrada 4 (X₄)" },
+  { key: "Y4", label: "Interno 4 (Y₄)" },
+  { key: "Z4", label: "Salida 4 (Z₄)" }
+];
+
 // ---------- Combinar lecturas de varios dispositivos ----------
 
 // Junta las lecturas existentes con las importadas de un companero, sin
@@ -46,6 +64,36 @@ VP.mergeLecturas = function (existing, incoming) {
     if (!valid) { skipped++; return; }
     if (!byId[r.id]) added++;
     byId[r.id] = r;
+  });
+  var merged = Object.keys(byId).map(function (id) { return byId[id]; });
+  merged.sort(function (a, b) { return parseInt(a.id, 10) - parseInt(b.id, 10); });
+  return { merged: merged, added: added, skipped: skipped, total: merged.length };
+};
+
+// Igual que VP.mergeLecturas pero para aforos del estudio de Volumen, con
+// una diferencia clave: a diferencia de una lectura (un evento que se
+// escribe una sola vez), un aforo sigue creciendo y cambia de estado
+// (abierto -> finalizado) en el dispositivo que lo inicio. Si el mismo id
+// ya existe localmente, la copia local siempre gana -- nunca se sobreescribe
+// con una version entrante, que podria ser una version vieja/sin terminar
+// de ese mismo aforo (ej. un companero reenvia un export desactualizado).
+VP.mergeAforos = function (existing, incoming) {
+  var byId = {};
+  existing.forEach(function (a) { byId[a.id] = a; });
+  var movimientoKeys = VP.MOVIMIENTOS.map(function (m) { return m.key; });
+  var added = 0, skipped = 0;
+  incoming.forEach(function (a) {
+    var valid = a && typeof a.id === "string" &&
+      movimientoKeys.indexOf(a.movimiento) !== -1 &&
+      typeof a.inicioMs === "number" && isFinite(a.inicioMs) &&
+      Array.isArray(a.intervalos) &&
+      a.intervalos.every(function (iv) {
+        return iv && typeof iv === "object" && iv.counts && typeof iv.counts === "object";
+      });
+    if (!valid) { skipped++; return; }
+    if (byId[a.id]) return; // ya existe localmente: la copia local manda
+    byId[a.id] = a;
+    added++;
   });
   var merged = Object.keys(byId).map(function (id) { return byId[id]; });
   merged.sort(function (a, b) { return parseInt(a.id, 10) - parseInt(b.id, 10); });
