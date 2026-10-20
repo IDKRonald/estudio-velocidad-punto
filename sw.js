@@ -1,4 +1,4 @@
-var CACHE_NAME = "velpunto-cache-v4";
+var CACHE_NAME = "velpunto-cache-v5";
 var ASSETS = [
   "./",
   "./index.html",
