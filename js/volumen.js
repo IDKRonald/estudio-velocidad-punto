@@ -431,6 +431,9 @@
   // ---------- Init ----------
 
   VP.volumen = {
+    getSession: function () { return session; },
+    showView: showVolumenView,
+    back: goToMovimientoPicker,
     init: function () {
       session = loadVolumenSession();
       if (session && findActiveAforo()) {

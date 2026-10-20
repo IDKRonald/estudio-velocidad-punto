@@ -1,4 +1,4 @@
-var CACHE_NAME = "velpunto-cache-v6";
+var CACHE_NAME = "velpunto-cache-v7";
 var ASSETS = [
   "./",
   "./index.html",
@@ -7,6 +7,7 @@ var ASSETS = [
   "./js/export.js",
   "./js/app.js",
   "./js/volumen.js",
+  "./js/analisis.js",
   "./js/main.js",
   "./js/vendor/exceljs.min.js",
   "./js/vendor/chart.umd.min.js",

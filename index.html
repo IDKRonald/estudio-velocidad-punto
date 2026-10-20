@@ -229,6 +229,9 @@
     <div class="card">
       <h2>Seleccione el movimiento</h2>
       <div class="category-grid movimiento-grid" id="movimientoGrid"></div>
+      <div class="actions">
+        <button type="button" class="btn btn-ghost" id="btnGoAnalisis">Analisis (VHMD / FHP)</button>
+      </div>
     </div>
   </section>
 
@@ -291,6 +294,26 @@
     </div>
   </section>
 
+  <!-- VISTA: Analisis (VHMD / FHP) -->
+  <section id="view-volumen-analisis" class="vol-view">
+    <div class="card">
+      <h2>Analisis</h2>
+      <p class="muted small">Aforos incluidos (los del mismo movimiento se suman intervalo por intervalo):</p>
+      <div id="analisisAforos"></div>
+      <label>Base del VHMD
+        <select id="analisisBase">
+          <option value="X">Entradas (X)</option>
+          <option value="Z">Salidas (Z)</option>
+        </select>
+      </label>
+      <div id="analisisResultados"></div>
+      <div class="actions">
+        <button type="button" class="btn btn-ghost" id="btnAnalisisBack">Volver</button>
+        <button type="button" class="btn btn-primary" id="btnExportAnalisisExcel">Exportar Excel</button>
+      </div>
+    </div>
+  </section>
+
 </main>
 
 </div><!-- /#volumen-app -->
@@ -301,6 +324,7 @@
 <script src="js/export.js"></script>
 <script src="js/app.js"></script>
 <script src="js/volumen.js"></script>
+<script src="js/analisis.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>
